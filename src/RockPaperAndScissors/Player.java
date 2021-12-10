@@ -32,4 +32,7 @@ public abstract class Player {
         this.score ++;
     }
 
+    public int getScore() {
+        return  this.score;
+    }
 }
