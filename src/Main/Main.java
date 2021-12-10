@@ -1,12 +1,17 @@
 package Main;
 
 import RockPaperAndScissors.Computer;
+import RockPaperAndScissors.History;
 import RockPaperAndScissors.Person;
+import RockPaperAndScissors.Player;
 
-import javax.print.attribute.standard.PagesPerMinute;
+import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 
 public class Main {
@@ -18,23 +23,34 @@ public class Main {
     static final String PLAY = "play";
     static final String HISTORY = "history";
 
-    static List<String> gameScore = new ArrayList<>();
-    static String details = "              History of your game               \n " +
-                            "              =================                \n" ;
+    private static final  List<History> gameScore = new ArrayList<>();
+   // private static final List<SuperHero> superHeroes = new ArrayList<>();
 
 
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws IOException {
 
         startMenu();
 
     }
-    public  static void startGame(){
 
-        Person player1 = new Person("You", ROCK);
+    /**
+     * <h1> startGame</h1>
+     * <h2>description</h2>
+     *  Set up 2 players and check the winner after each round
+     *  Save the game to history file
+     * @throws IOException
+     */
+    public  static void startGame() throws IOException {
+
+        Person player1 = new Person("You");
         Computer player2 = new Computer(randomPick());
+        List<Player> players = new ArrayList<>() ;
+        players.add(player1);
+        players.add(player2);
         boolean status = true;
-        details += player1.getName() +"        Vs        "+ player2.getName()+"\n";
+        History history = new History(LocalDate.now(),players );
 
         int i=0;
         while(status){
@@ -42,7 +58,6 @@ public class Main {
             System.out.println("Type 'quit' to go back to main menu.");
             String answer = input.nextLine();
             if(answer.equalsIgnoreCase(QUIT)){
-                details += player1.getScore() +"                        "+ player2.getScore()+"\n";
 
                 status = false;
                 startMenu();
@@ -54,50 +69,61 @@ public class Main {
 
                 System.out.println("Computer choice: "+ player2.getTocken());
                 if(player1.getTocken().equals(player2.getTocken())){
-                    details +="          tie          "+"\n";
-
-                    System.out.println("It is a tie");
+                    history.setResult("It's a Tie");
               }else if (player1.getTocken().equals(ROCK)){
                     if (player2.getTocken().equals(PAPER)){
-                        details +="                      Won     "+"\n";
+                        history.setResult(player1.getName() +" Lost");
                         System.out.println(player2.getName() + " won!");
-                        player2.incrementScore();
+
                     }else if (player2.getTocken().equals(SCISSORS)){
-                        details +="Won                     "+"\n";
-                        player1.incrementScore();
+                        history.setResult(player1.getName() +" Won");
                         System.out.println(player1.getName() + " won!");
                     }
                 }else if (player1.getTocken().equals(PAPER)){
                     if (player2.getTocken().equals(ROCK)){
-                        details +="Won                      "+"\n";
-                        player1.incrementScore();
+                        history.setResult(player1.getName() +" Won");
                         System.out.println(player1.getName() + " won!");
                     }else if (player2.getTocken().equals(SCISSORS)){
-                        details +="                        Won     "+"\n";
-                        player2.incrementScore();
+                        history.setResult(player1.getName() +" Lost");
                         System.out.println(player2.getName() + " won!");
                     }
                 }else if (player1.getTocken().equals(SCISSORS)){
                     if (player2.getTocken().equals(PAPER)){
-                        details +="Won                     "+"\n";
-                        player1.incrementScore();
+                        history.setResult(player1.getName() +" Won");
                         System.out.println(player1.getName() + " won!");
                     }else if (player2.getTocken().equals(ROCK)){
-                        details +="Won                       "+"\n";
-                        player1.incrementScore();
+                        history.setResult(player1.getName() +" Won");
                         System.out.println(player1.getName() + " won!");
                     }
                 }
             }
+            //Save to file
+            writeFile("src/RockPaperAndScissors/histoty.txt",history.getPlayers(), history.getDate(), history.getResult());
         }
 
         startMenu();
     }
-    public static void history(){
-        boolean active = true;
 
+    /**
+     * <h1>History method</h1>
+     * <p>History method displays the history of your game</p>
+     * <p>Shows your wins, lost and tie </p>
+     * <p>Shows the date</p>
+     *  @throws IOException
+     */
+    public static void history() throws IOException {
+        boolean active = true;
+        try{
+            readFile("src/RockPaperAndScissors/histoty.txt");
+        } catch (IOException e) {
+            System.out.println("Error while reading the file: " + e.getMessage());
+        }
         while (active){
-            System.out.println(details);
+            for (int i = 0; i < gameScore.size(); i++) {
+            System.out.println(gameScore.get(i).getPlayers() + "  "+ gameScore.get(i).getDate()
+            +" "+ gameScore.get(i).getResult());
+        }
+        System.out.println();
             System.out.println("Type 'quit' to go back to main menu");
             String key = input.nextLine();
             if (key.equalsIgnoreCase(QUIT)){
@@ -105,6 +131,11 @@ public class Main {
             }
         }startMenu();
     }
+    /**
+     * <h1>random method</h1>
+     * <p>randomPick return String ("rock"),("paper") or ("scissors")</p>
+     * <p>Call the Math.floor to round the random pick got from Math.random</p>
+     */
     public static String randomPick(){
 
         int ran = (int) Math.floor(Math.random() * 3);
@@ -116,7 +147,18 @@ public class Main {
             return "scissors";
         }
     }
-    public static void startMenu(){
+
+    /**
+     * <h1>Start Menu</h1>
+     * <p>This method display a list of option.After input validation it will call the appropriate method</p>
+     *
+     * <p> 1 play call @startGame method</p>
+     * <p> 2 history call @history method</p>
+     * <p> 3 quit call System.exit(0) to exit the game</p>
+     */
+
+    public static void startMenu() throws IOException {
+        System.out.println("Welcome to Rock, Paper, Scissors!");
         System.out.println("MAIN MENU");
         System.out.println("=====");
         System.out.println("1. Type 'play' to play.");
@@ -131,4 +173,71 @@ public class Main {
             case QUIT ->{ System.out.println("quit game");System.exit(0);}
         }
     }
+
+    /**
+     *
+     * @param fileName
+     * @throws IOException
+     * Read the records from the @fileName
+     */
+
+    public static void readFile(String fileName) throws IOException {
+        File file = new File(fileName);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+
+            String currentLine = reader.readLine();
+
+            while (currentLine != null) {
+                History history = new History();
+                String[] data = currentLine.split(",");
+                List<Player> players = new ArrayList<> ();
+                players.add(new Person(data[0]) );
+                players.add(new Person(data[1]) );
+
+                history.setPlayers(players);
+                history.setDate(LocalDate.parse(data[2]));
+                gameScore.add(history);
+                currentLine = reader.readLine();
+            }
+        } finally {
+            assert reader != null;
+            reader.close();
+        }
+    }
+
+    /**
+     *
+     * @param fileName
+     * @param players
+     * @param date
+     * @param result
+     * @throws IOException
+     */
+    public static void writeFile(String fileName, List<Player> players, LocalDate date, String result) throws IOException {
+        FileWriter writer = new FileWriter(fileName,true);
+        BufferedWriter buffer = new BufferedWriter(writer);
+          String playersStr = players.stream().map(x->x.getName()).collect(Collectors.joining(" "));
+        buffer.write(playersStr);
+        buffer.write(",");
+        buffer.write(date.toString());
+        buffer.write(",");
+        buffer.write(result);
+        buffer.newLine();
+        buffer.close();
+
+        System.out.println("Write Success!");
+    }
+
+
+
+
+
+
+
+
+
+
+
 }

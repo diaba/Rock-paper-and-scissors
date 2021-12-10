@@ -1,0 +1,4 @@
+[RockPaperAndScissors.Person@681a9515, RockPaperAndScissors.Computer@3af49f1c],2021-12-10,You Lost
+YouComputer,2021-12-10,You Won
+YouComputer,2021-12-10,It's a Tie
+YouComputer,2021-12-10,You Won

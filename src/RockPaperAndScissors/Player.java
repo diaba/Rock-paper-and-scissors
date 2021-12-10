@@ -1,7 +1,22 @@
 package RockPaperAndScissors;
 
 public abstract class Player {
+    public Player(String name) {
+        this.name = name;
+    }
+
+
+
     private String name;
+    private String result;
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
 
     public String getName() {
         return name;
@@ -25,14 +40,8 @@ public abstract class Player {
     public Player(String name, String tocken) {
         this.name = name;
         this.tocken = tocken;
-        this.score = 0;
+
     }
 
-    public void incrementScore(){
-        this.score ++;
-    }
 
-    public int getScore() {
-        return  this.score;
-    }
 }
