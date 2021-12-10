@@ -120,7 +120,7 @@ public class Main {
         }
         while (active){
             for (int i = 0; i < gameScore.size(); i++) {
-            System.out.println(gameScore.get(i).getPlayers() + "  "+ gameScore.get(i).getDate()
+            System.out.println(gameScore.get(i).getPlayers().stream().map(x->x.getName()).collect(Collectors.joining(" Vs ")) + "  "+ gameScore.get(i).getDate()
             +" "+ gameScore.get(i).getResult());
         }
         System.out.println();
@@ -153,7 +153,7 @@ public class Main {
      * <p>This method display a list of option.After input validation it will call the appropriate method</p>
      *
      * <p> 1 play call @startGame method</p>
-     * <p> 2 history call @history method</p>
+     * <p> 2 history call {@link #history()}  method</p>
      * <p> 3 quit call System.exit(0) to exit the game</p>
      */
 
@@ -198,6 +198,7 @@ public class Main {
 
                 history.setPlayers(players);
                 history.setDate(LocalDate.parse(data[2]));
+                history.setResult(data[3]);
                 gameScore.add(history);
                 currentLine = reader.readLine();
             }
@@ -218,7 +219,7 @@ public class Main {
     public static void writeFile(String fileName, List<Player> players, LocalDate date, String result) throws IOException {
         FileWriter writer = new FileWriter(fileName,true);
         BufferedWriter buffer = new BufferedWriter(writer);
-          String playersStr = players.stream().map(x->x.getName()).collect(Collectors.joining(" "));
+        String playersStr = players.stream().map(x->x.getName()).collect(Collectors.joining(","));
         buffer.write(playersStr);
         buffer.write(",");
         buffer.write(date.toString());
@@ -229,15 +230,6 @@ public class Main {
 
         System.out.println("Write Success!");
     }
-
-
-
-
-
-
-
-
-
 
 
 }
