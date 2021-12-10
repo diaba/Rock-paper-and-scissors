@@ -21,16 +21,14 @@ public class Main {
     static final  String SCISSORS = "scissors";
     static final String QUIT = "quit";
     static final String PLAY = "play";
+    static final String PLAYFriend = "playfriend";
     static final String HISTORY = "history";
 
     private static final  List<History> gameScore = new ArrayList<>();
-   // private static final List<SuperHero> superHeroes = new ArrayList<>();
-
 
 
 
     public static void main(String[] args) throws IOException {
-
         startMenu();
 
     }
@@ -38,17 +36,16 @@ public class Main {
     /**
      * <h1> startGame</h1>
      * <h2>description</h2>
+     *
      *  Set up 2 players and check the winner after each round
      *  Save the game to history file
+     *  @param players
      * @throws IOException
      */
-    public  static void startGame() throws IOException {
 
-        Person player1 = new Person("You");
-        Computer player2 = new Computer(randomPick());
-        List<Player> players = new ArrayList<>() ;
-        players.add(player1);
-        players.add(player2);
+    public  static void startGame(List<Player> players) throws IOException {
+        Player player1 = players.get(0);
+        Player player2 = players.get(1);
         boolean status = true;
         History history = new History(LocalDate.now(),players );
 
@@ -158,19 +155,43 @@ public class Main {
      */
 
     public static void startMenu() throws IOException {
+
         System.out.println("Welcome to Rock, Paper, Scissors!");
         System.out.println("MAIN MENU");
         System.out.println("=====");
-        System.out.println("1. Type 'play' to play.");
-        System.out.println("2. Type 'history' to view your game history.");
-        System.out.println("3. Type 'quit' to stop playing.");
+        System.out.println("1. Type 'play' to play with computer.");
+        System.out.println("2. Type 'playfriend' to play with friend.");
+        System.out.println("3. Type 'history' to view your game history.");
+        System.out.println("4. Type 'quit' to stop playing.");
 
         input = new Scanner(System.in);
         String a  = input.nextLine();
+
         switch (a.toLowerCase()) {
-            case PLAY -> {System.out.println("Play ");startGame();}
+            case PLAY ->
+                    {
+                        Person player1 = new Person("You");
+                        Computer player2 = new Computer(randomPick());
+                        List<Player> players = new ArrayList<>() ;
+                        players.add(player1);
+                        players.add(player2);
+                        System.out.println("Play with computer");
+                        startGame(players);
+                  }
+            case PLAYFriend ->
+                    {
+                        System.out.println("Please enter your friend's name");
+                        String friend = input.nextLine();
+                        Person player1 = new Person("You");
+                        Person player2 = new Person(friend);
+                        List<Player> players = new ArrayList<>() ;
+                        players.add(player1);
+                        players.add(player2);
+
+                        startGame(players);
+            }
             case HISTORY -> history();
-            case QUIT ->{ System.out.println("quit game");System.exit(0);}
+            case QUIT ->{ System.out.println("quit game Goodbye.");System.exit(0);}
         }
     }
 
@@ -230,6 +251,4 @@ public class Main {
 
         System.out.println("Write Success!");
     }
-
-
 }
